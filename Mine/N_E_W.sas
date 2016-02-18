@@ -1,7 +1,7 @@
 %*********************************************************************
 **********************************************************************
 ** MACRO: N_E_W                                                     **
-** Description:	Add Custom NOTE, ERROR, and WARNING Messages to Log **
+** Description:  Add Custom NOTE, ERROR, and WARNING Messages to Log**
 ** Created: 07/29/2014                                              **
 ** Created by: Matthew Kelliher-Gibson                              **
 ** Parameters:                                                      **
@@ -27,8 +27,19 @@
 **************************************************
 **************************************************;
 
-%macro N_E_W(text, type=, delim=|)
+%macro N_E_W(text, type=, delim=|, _autocall = YES)
 									/* / store source des= "Adds Custom NOTE, ERROR, and WARNING Messages to Log"*/;
+									
+%**************
+*0. AUTOCALL  *
+***************;
+
+	%local _autocall;
+	
+	%if %upcase(&_autocall) ne YES or %upcase(&_autocall) ne Y
+	%then 
+		%Macro_check(repeat);
+	
 %********************
 *I. DEFAULT VALUES  *
 *********************;
