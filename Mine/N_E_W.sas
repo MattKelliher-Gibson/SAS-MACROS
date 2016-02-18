@@ -1,37 +1,36 @@
 %*********************************************************************
 **********************************************************************
-** MACRO: N_E_W														**
-** Purpose:	Add Custom NOTE, ERROR, and WARNING Messages to Log	    **
-** Created: 07/29/2014												**
-** Created by: Matthew Kelliher-Gibson							    **
-** Last Modified: 07/29/2014									    **
-** Stage: Live									         		    **
-** Parameters:														**
-**		Text= 		Message to Appear in Log						**
-**		Type= 		Type of Message:								**
-**						N or NOTE									**
-**						E or ERROR									**
-**						W or WARNING								**
-**		Delim= (|) 	Character to Indicate Carriage Returns 			**
-** MACROS Used:														**
-**		%Repeat														**
+** MACRO: N_E_W                                                     **
+** Description:	Add Custom NOTE, ERROR, and WARNING Messages to Log **
+** Created: 07/29/2014                                              **
+** Created by: Matthew Kelliher-Gibson                              **
+** Parameters:                                                      **
+**     Text=    Message to Appear in Log                            **
+**     Type=    Type of Message:                                    **
+**                 N or NOTE                                        **
+**                 E or ERROR                                       **
+**                 W or WARNING                                     **
+**     Delim= (|)    Character to Indicate Carriage Returns         **
+** MACROS Used:                                                     **
+**     %Repeat                                                      **
 **********************************************************************
 **********************************************************************;
 
+%*************************************************
+**************************************************
+** Version History:                             **
+** 1.0.0 - 07/29/2014 - Original File Created   **
+** 1.0.1 - 07/30/2014 - Minor Updates           **
+** 1.0.2 - 09/08/2014 - Bug Fix                 **
+** 1.0.3 - 01/25/2016 - Changed MACRO directory **
+** 1.0.4 - 02/17/2016 - Added Extra Spacing     **
+**************************************************
+**************************************************;
+
 %macro N_E_W(text, type=, delim=|)
 									/* / store source des= "Adds Custom NOTE, ERROR, and WARNING Messages to Log"*/;
-%************
-*I. MACROS	*
-*************;
-
-	%*A. Repeat;
-	
-		%if %sysmacexist(repeat) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\repeat.sas";
-
 %********************
-*II. DEFAULT VALUES	*
+*I. DEFAULT VALUES  *
 *********************;
 
 	%*A. Declare MACRO Variables Local;
@@ -78,12 +77,13 @@
 						%return;
 					%end;
 
-%****************
-*III. MESSAGE	*
-*****************;
+%**************
+*II. MESSAGE  *
+***************;
 
 	%*A. Top Boarder;
 
+		%put ;
 		%put &type.: %repeat(*,80);
 
 	%*B. Message;
@@ -93,7 +93,7 @@
 			%if &type = NOTE
 			%then
 				%do i=1 %to &_n;
-					%put %bquote(	  %sysfunc(strip(%scan(&text,&i,&delim)));
+					%put %bquote(	     %sysfunc(strip(%scan(&text,&i,&delim))));
 				%end;
 
 		%*2. Errors and Warnings;
@@ -106,5 +106,6 @@
 	%*C. Bottom Boarder;
 
 		%put &type.: %repeat(*,80);
+		%put ;
 
 %mend N_E_W;
