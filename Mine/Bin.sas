@@ -13,6 +13,8 @@
 **		Max (10):        Maximum Number of Bins       **
 **		Debug (FALSE):   If TRUE then dataset _freq_  **
 **                     is not deleted               **
+**     _autocall (TRUE):  If FALSE all MACROS       **
+**                        must be compiled          **
 ** MACROS Used:                                     **
 **		%N_E_W                                        **
 **		%Data_Error                                   **

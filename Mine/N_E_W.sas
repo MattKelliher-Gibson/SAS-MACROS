@@ -5,12 +5,13 @@
 ** Created: 07/29/2014                                              **
 ** Created by: Matthew Kelliher-Gibson                              **
 ** Parameters:                                                      **
-**     Text=    Message to Appear in Log                            **
-**     Type=    Type of Message:                                    **
+**     Text:    Message to Appear in Log                            **
+**     Type:    Type of Message:                                    **
 **                 N or NOTE                                        **
 **                 E or ERROR                                       **
 **                 W or WARNING                                     **
-**     Delim= (|)    Character to Indicate Carriage Returns         **
+**     Delim: (|)    Character to Indicate Carriage Returns         **
+**      _autocall (TRUE):  If FALSE all MACROS must be compiled     **
 ** MACROS Used:                                                     **
 **     %Repeat                                                      **
 **********************************************************************

@@ -10,6 +10,7 @@
 **		pct:				  Percentile to Cap Variables at                          **
 **		report (YES): If Histograms should be printed                         **
 **		file:				  File location to save PDF of histograms                 **
+**     _autocall (TRUE):  If FALSE all MACROS must be compiled              **
 ** MACROS Used:                                                             **
 **		%data_error                                                           **
 **		%N_E_W                                                                **
