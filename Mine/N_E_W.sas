@@ -21,6 +21,7 @@
 ** 1.0.3 - 01/25/2016 - Changed MACRO directory                     **
 ** 1.0.4 - 02/17/2016 - Added Extra Spacing                         **
 ** 1.0.5 - 02/19/2016 - Corrected autocall logic                    **
+** 1.0.6 - 02/19/2016 - Revert Back to Original autocall logic      **
 **********************************************************************
 **********************************************************************;
 
@@ -33,7 +34,7 @@
 
 	%local _autocall;
 	
-	%if %upcase(&_autocall) = YES or %upcase(&_autocall) = Y
+	%if %upcase(&_autocall) ne YES or %upcase(&_autocall) ne Y
 	%then 
 		%Macro_check(repeat);
 	
