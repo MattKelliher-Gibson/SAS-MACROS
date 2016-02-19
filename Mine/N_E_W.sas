@@ -34,7 +34,7 @@
 
 	%local _autocall;
 	
-	%if %upcase(&_autocall) ne YES or %upcase(&_autocall) ne Y
+	%if %upcase(&_autocall) ne YES and %upcase(&_autocall) ne Y
 	%then 
 		%Macro_check(repeat);
 	
