@@ -25,7 +25,7 @@
 **********************************************************************
 **********************************************************************;
 
-%macro N_E_W(text, type=, delim=|, _autocall = YES)
+%macro N_E_W(text, type=, delim=|, _autocall = TRUE)
 									/* / store source des= "Adds Custom NOTE, ERROR, and WARNING Messages to Log"*/;
 									
 %**************
@@ -34,7 +34,7 @@
 
 	%local _autocall;
 	
-	%if %upcase(&_autocall) ne YES and %upcase(&_autocall) ne Y
+	%if %upcase(&_autocall) ne TRUE and %upcase(&_autocall) ne T
 	%then 
 		%Macro_check(repeat);
 	
