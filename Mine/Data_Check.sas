@@ -1,6 +1,23 @@
+%*******************************************************************
+********************************************************************
+** MACRO: Data_Check                                              **
+** Description:	Checks if Dataset Name is valid and exists        **
+** Created: 10/15/2014                                            **
+** Created by: Matthew Kelliher-Gibson                            **
+** Parameters:                                                    **
+**		Dataset:            Dataset to Check                        **
+**     _autocall (TRUE):  If FALSE all MACROS                     **
+**                        must be compiled                        **
+** MACROS:                                                        **
+**		%N_E_W                                                      **
+********************************************************************
+** Version History:                                               **
+** 0.1.0 - 10/15/2014 - Original File Created                     **
+** 0.1.1 - 02/19/2016 - Add Header and Autocall                   **
+********************************************************************
+********************************************************************;
 
-
-%macro data_check(dataset);
+%macro data_check(dataset, _autocall=TRUE);
 %************
 *I. SETUP	*
 *************;
@@ -21,14 +38,9 @@
 
 	%*C. MACROS;
 	
-		%*1. N_E_W;
-
-			%if %sysmacexist(N_E_W) = 0
-			%then
-				%do;
-					%inc "T:\MKG\MACROS\GENERAL\n_e_w.sas"
-					%N_E_W(MACRO N_E_W Compiled!, type=N);
-				%end;
+		%if &_autocall ne TRUE and &_autocall ne T
+		%then
+			%macro_check(N_E_W);
 
 %********************
 *II. Check Dataset	*

@@ -1,34 +1,29 @@
 **************************************************************
-**************************************************************
-** MACRO: Decile											**
-** Purpose: To sort data and assigns to equal 				**
-**			groups (usually deciles)						**
-** Created: 2/11/2014										**
-** Created By: Matthew Kelliher-Gibson						**
-** Last Modified: 4/30/2014									**
-** Stage: BETA	(NEEDS UPDATE AND CLEAN UP)					**
-** Parameters:												**
-**		Dataset= Input Datase that will be sorted 			**
-**			and assigned to groups							**
-**		Target= (P_Target1) The variable to be sorted on	**
-**		Decile= (GLOBAL_DECILE) Variable name for the 		**
-**			group assignments								**
-**		Site= (NO) By variable for additionally assinged 	**
-**			grouping										**
-**		S_Decile= (SITE_DECILE) Variable name for group by	**
-**			assignment										**
-**		Number_of_Groups= Number of groups to be assigned	**
-**************************************************************
-**************************************************************;
-
 **********************************************************************
+** MACRO: Decile                                                    **
+** Purpose: To sort data and assigns to equal                       **
+**          groups (usually deciles)                                **
+** Created: 2/11/2014                                               **
+** Created By: Matthew Kelliher-Gibson                              **
+** Parameters:                                                      **
+**    Dataset:             Input Datase that will be sorted         **
+**                           and assigned to groups                 **
+**    Target (P_Target1):  The variable to be sorted on	            **
+**    Decile (GLOBAL_DECILE):  Variable name for the                **
+**                               group assignments                  **
+**    Site (NO):  By variable for additionally assinged             **
+**                  grouping                                        **
+**    S_Decile (SITE_DECILE):  Variable name for group by           **
+**                               assignment                         **
+**    Number_of_Groups:  Number of groups to be assigned            **
 **********************************************************************
-** Version History:													**
-** 1.0.0 - 02/11/2014 - Original File								**
-** 2.0.0 - 03/06/2014 - Site Deciling Added							**
-** 2.1.0 - 04/30/2014 - Added Grouping by any number				**
-** 2.2.0 - 04/30/2014 - Added MACRO Windows and Parameter Checks	**
-** 2.2.1 - 10/29/2014 - Added MACRO Calls and Minor Updates			**
+** Version History:                                                 **
+** 0.1.0 - 02/11/2014 - Original File                               **
+** 0.2.0 - 03/06/2014 - Site Deciling Added                         **
+** 0.2.1 - 04/30/2014 - Added Grouping by any number                **
+** 0.2.2 - 04/30/2014 - Added MACRO Windows and Parameter Checks    **
+** 0.2.3 - 10/29/2014 - Added MACRO Calls and Minor Updates         **
+** 0.2.4 - 02/19/2016 - Formatting Fixed                            **
 **********************************************************************
 **********************************************************************;
 

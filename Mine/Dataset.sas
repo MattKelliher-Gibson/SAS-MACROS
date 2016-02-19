@@ -1,16 +1,18 @@
 %*****************************************************************************
 ******************************************************************************
-** MACRO: Dataset															**
-** Purpose:	Parse Dataset Name and Assign MACRO Variables Lib and Data 		**
-** Created: 08/09/2014														**
-** Created by: Matthew Kelliher-Gibson										**
-** Last Modified: 08/09/2014												**
-** Stage: Live																**
-** Parameters:																**
-**		Dataset -	Dataset Name to be Parsed								**
-** MACROS Used: 															**
-**		%N_E_W																**
+** MACRO: Dataset                                                           **
+** Purpose:	Parse Dataset Name and Assign MACRO Variables Lib and Data      **
+** Created: 08/09/2014                                                      **
+** Created by: Matthew Kelliher-Gibson                                      **
+** Parameters:                                                              **
+**		Dataset -	Dataset Name to be Parsed                                   **
+**                **Lib and Data MUST be GLOBAL Variables                   **
+** MACROS:                                                                  **
+**		%N_E_W                                                                **
 ******************************************************************************
+** Version History:                                                         **
+** 0.1.0 - 08/09/2014 - Inital File                                         **
+** 0.1.1 - 02/19/2016 - Add Autocall and fix formatting                     **
 ******************************************************************************;
 
 %macro Dataset(dataset);

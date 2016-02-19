@@ -15,7 +15,7 @@
 **                     is not deleted               **
 **     _autocall (TRUE):  If FALSE all MACROS       **
 **                        must be compiled          **
-** MACROS Used:                                     **
+** MACROS:                                          **
 **		%N_E_W                                        **
 **		%Data_Error                                   **
 **		%Dataset                                      **

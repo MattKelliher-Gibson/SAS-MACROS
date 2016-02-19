@@ -1,13 +1,16 @@
 %*****************************************************************************
 ******************************************************************************
-** MACRO: Data_Error														                            **
-** Description:	Checks for Data Step/Proc Error and Terminates if Needed		    **
+** MACRO: Data_Error                                                        **
+** Description:	Checks for Data Step/Proc Error and Terminates if Needed    **
 ** Created: 06/06/2014														                          **
 ** Created by: Matthew Kelliher-Gibson										                  **
 ** Parameters:																                              **
 **		NONE																                                  **
 ** MACROS Used: 															                              **
 **		%N_E_W																                                **
+******************************************************************************
+** Version History:                                                         **
+** 0.1.0 - 06/06/2014 - Inital File                                         **
 ******************************************************************************
 ******************************************************************************;
 
