@@ -14,18 +14,15 @@
 ** MACROS Used:                                                     **
 **     %Repeat                                                      **
 **********************************************************************
+** Version History:                                                 **
+** 1.0.0 - 07/29/2014 - Original File Created                       **
+** 1.0.1 - 07/30/2014 - Minor Updates                               **
+** 1.0.2 - 09/08/2014 - Bug Fix                                     **
+** 1.0.3 - 01/25/2016 - Changed MACRO directory                     **
+** 1.0.4 - 02/17/2016 - Added Extra Spacing                         **
+** 1.0.5 - 02/19/2016 - Corrected autocall logic                    **
+**********************************************************************
 **********************************************************************;
-
-%*************************************************
-**************************************************
-** Version History:                             **
-** 1.0.0 - 07/29/2014 - Original File Created   **
-** 1.0.1 - 07/30/2014 - Minor Updates           **
-** 1.0.2 - 09/08/2014 - Bug Fix                 **
-** 1.0.3 - 01/25/2016 - Changed MACRO directory **
-** 1.0.4 - 02/17/2016 - Added Extra Spacing     **
-**************************************************
-**************************************************;
 
 %macro N_E_W(text, type=, delim=|, _autocall = YES)
 									/* / store source des= "Adds Custom NOTE, ERROR, and WARNING Messages to Log"*/;
@@ -36,7 +33,7 @@
 
 	%local _autocall;
 	
-	%if %upcase(&_autocall) ne YES or %upcase(&_autocall) ne Y
+	%if %upcase(&_autocall) = YES or %upcase(&_autocall) = Y
 	%then 
 		%Macro_check(repeat);
 	
