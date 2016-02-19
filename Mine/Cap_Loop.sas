@@ -1,118 +1,139 @@
-%macro Cap_Loop_Beta(dataset=, vars=, pct=, report=YES, file=);
 %*****************************************************************************
 ******************************************************************************
-** MACRO: Cap_Loop															**
-** Purpose:	Cap Variables at a given Percentile				 				**
-** Created: 10/02/2014														**
-** Created by: Matthew Kelliher-Gibson										**
-** Last Modified: 08/10/2015												**
-** Stage: BETA																**
-** Parameters:																**
-**		dataset -			Input Dataset									**
-**		vars - 				MACRO Variable of Variables to be Capped		**
-**		pct -				Percentile to Cap Variables at					**
-**		report - (YES)		If Histograms should be printed					**
-**		file -				File location to save PDF of histograms			**
-** MACROS Used:																**
-**		%data_error															**
-**		%N_E_W																**
+** MACRO: Cap_Loop                                                          **
+** Description:	Cap Variables at a given Percentile                         **
+** Created: 10/02/2014                                                      **
+** Created by: Matthew Kelliher-Gibson                                      **
+** Parameters:                                                              **
+**		dataset:      Input Dataset                                           **
+**		vars:         List of Variables to be Capped                          **
+**		pct:				  Percentile to Cap Variables at                          **
+**		report (YES): If Histograms should be printed                         **
+**		file:				  File location to save PDF of histograms                 **
+** MACROS Used:                                                             **
+**		%data_error                                                           **
+**		%N_E_W                                                                **
+******************************************************************************
+** Version History:																						              **
+** 0.1.0 - 02/12/2014 - Original File Created															  **
+** 0.1.1 - 08/10/2015 - Added Formatting							 									    **
+** 0.1.2 - 02/19/2016 - Fix Formatting and Add Autocall											**
 ******************************************************************************
 ******************************************************************************;
 
-%*********************************************************************************************************
-**********************************************************************************************************
-** Version History:																						**
-** 1.0.0 - 02/12/2014 - Original File Created															**
-** 1.0.1 - 08/10/2015 - Added Formatting							 									**
-**********************************************************************************************************
-**********************************************************************************************************;
+%macro Cap_Loop(dataset=, vars=, pct=, report=YES, file=, _autocall=TRUE);
+%***********
+*I. SETUP  *
+************;
 
-%local dataset vars file pct report _words _var i _pct;
+	%*A. Local Variables;
+	
+		%local dataset vars file pct report _words _var i _pct _autocall;
 
-%let _words = %sysfunc(countw(&vars));
+	%*B. MACROS;
+	
+		%if %upcase(&_autocall) ne TRUE and %upcase(&_autocall) ne T
+		%then
+			%macro_check(data_error, N_E_W);
+	
+	%*C. Variables;
+	
+		%let _words = %sysfunc(countw(&vars));
 
-%N_E_W(Total Variables to Cap is: &_words, type=N);
+		%N_E_W(Total Variables to Cap is: &_words, type=N);
 
-%do i=1 %to &_words;
+%***************
+*II. CAP LOOP  *
+****************;
 
-	%N_E_W(Variable &i, type=N);
+	%do i=1 %to &_words;
 
-	%let _var = %scan(&vars, &i);
+		%N_E_W(Variable &i, type=N);
 
-	%N_E_W(Calculate &pct.th Percentile, type=N);
+		%let _var = %scan(&vars, &i);
 
-	proc means noprint
-		data=&dataset (keep=&_var);
-		output
-			out=_temp_
-			P&pct=_pct
-		;
-	run;
+		%N_E_W(Calculate &pct.th Percentile, type=N);
 
-	%data_error;
+	%*A. Calculate Percentile;
+	
+		proc means noprint
+			data=&dataset (keep=&_var);
+			output
+				out=_temp_
+				P&pct. =_pct
+			;
+		run;
 
-	%N_E_W(Store &pct.th Percentile, type=N);
+		%data_error;
 
-	proc sql noprint;
-		select
-			_pct
-		into
-			:&_pct
-		from
-			_temp_
-		;
-	quit;
+		%N_E_W(Store &pct.th Percentile, type=N);
 
-	%data_error;
+		proc sql noprint;
+			select
+				_pct
+			into
+				:&_pct
+			from
+				_temp_
+			;
+		quit;
 
-	%N_E_W(Cap Variable %upcase(&_var), type=N);
+		%data_error;
 
-	data &dataset;
-		set &dataset;
-		if &_var gt &_pct
-		then
-			&_var = &_pct;
-		else
-			&_var=&_var;
-	run;
+		%N_E_W(Cap Variable %upcase(&_var), type=N);
 
-	%data_error;
+	%*B. Cap Variable;
+	
+		data &dataset;
+			set &dataset;
+			if &_var gt &_pct
+			then
+				&_var = &_pct;
+			else
+				&_var=&_var;
+		run;
 
-	%let _var = ;
+		%data_error;
 
-	%let _pct = ;
+		%let _var = ;
 
-	proc delete
-		data=_temp_;
-	run;
+		%let _pct = ;
 
-	%data_error;
+		proc delete
+			data=_temp_;
+		run;
 
-%end;
+		%data_error;
 
-%if &Report = YES
-%then
-%do;
-	%N_E_W(Capping Complete!|Produce Histograms, type=N);
+	%end;
 
-	ods html close;
+%*****************
+*III. REPORTING  *
+******************;
 
-	ods pdf file="&file";
+	%if &Report = YES
+	%then
+	%do;
+		%N_E_W(Capping Complete!|Produce Histograms, type=N);
 
-	proc univariate
-		data=&dataset;
-		var &vars;
-		histogram;
-	run;
+		ods html close;
 
-	ods pdf close;
+		ods pdf file="&file";
 
-	ods html;
+		proc univariate
+			data=&dataset;
+			var &vars;
+			histogram;
+		run;
 
-	%data_error;
+		ods pdf close;
 
-	%N_E_W(Report of _words Capped Variables Complete!, type=N);
-%end;
+		ods html;
+
+		%data_error;
+
+		%N_E_W(Report of _words Capped Variables Complete!, type=N);
+	%end;
 
 %N_E_W(Process Done!, type=N);
-%mend Cap_Loop_Beta;
+%mend Cap_Loop;
