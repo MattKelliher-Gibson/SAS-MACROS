@@ -1,141 +1,86 @@
 %*****************************************************************************
 ******************************************************************************
-** MACRO: Name_Map															**
-** Purpose:	Take Client File, Map and Adjust Name and Address Fields 		**
-** Created: 08/07/2014														**
-** Created by: Matthew Kelliher-Gibson										**
-** Last Modified: 09/04/2014												**
-** Stage: BETA																**
-** Parameters:																**
-**		Dataset -	File to be Mapped and Adjusted							**
-**		First - 	Name of Variable Containing First Name					**
-**		Last - 		Name of Variable Containing Last Name					**
-**		Address1 -	Name of Variable Containing Address1					**
-**		Address2 -	Name of Variable Containing Address2					**
-**		City -		Name of Variable Containing City						**
-**		ST -		Name of Variable Containing State						**
-**		Zip5 -		Name of Variable Containing Zip5						**
-**		Plus4 -		Name of Variable Containing Plus4						**
-**		Phone -		Name of Variable Containing Phone Number				**
-**		Area_Code -	Name of Variable Containing Area Code					**
-** MACROS Used: 															**
-**		%Dataset															**
-**		%Data_Error															**
-**		%Array																**
-**		%Do_Over															**
-**		%Remove_Labels_Beta													**
-**		%Capitalize															**
+** MACRO: Name_Map                                                          **
+** Description:	Take Client File, Map and Adjust Name and Address Fields    **
+** Created: 08/07/2014                                                      **
+** Created by: Matthew Kelliher-Gibson                                      **
+** Parameters:                                                              **
+**    Dataset:    File to be Mapped and Adjusted                            **
+**    First:      Name of Variable Containing First Name                    **
+**    Last:       Name of Variable Containing Last Name                     **
+**    Address1:   Name of Variable Containing Address1                      **
+**    Address2:   Name of Variable Containing Address2                      **
+**    City:       Name of Variable Containing City                          **
+**    ST:         Name of Variable Containing State                         **
+**    Zip5:       Name of Variable Containing Zip5                          **
+**    Plus4:      Name of Variable Containing Plus4                         **
+**    Phone:      Name of Variable Containing Phone Number                  **
+**    Area_Code:  Name of Variable Containing Area Code                     **
+**    autocall (TRUE):  Logical, indicates use of autocall library          **
+** MACROS Used:                                                             **
+**    %Dataset                                                              **
+**    %Data_Error                                                           **
+**    %Array                                                                **
+**    %Do_Over                                                              **
+**    %Remove_Labels                                                        **
+**    %Capitalize                                                           **
+**    %Macro_Check                                                          **
+******************************************************************************
+** Version History:                                                         **
+** 0.1.0 - 08/07/2014 - Original File                                       **
+** 0.1.1 - 08/08/2014 - Fixed Bugs and Added Parsing and Addition of Fields **
+** 0.2.0 - 08/09/2014 - Add local, Add DATASET                              **
+** 0.3.0 - 08/13/2014 - Add Phone Parsing                                   **
+** 0.3.1 - 08/13/2014 - Debug                                               **
+** 0.3.2 - 09/03/2014 - Add MACRO Checks and Zip Code Numeric Checks        **
+** 0.4.0 - 09/04/2014 - Completely Re-Wrote Name Parsing Logic              **
+** 0.4.1 - 09/09/2014 - Added MACRO Checks for Array and Do_Over            **
+** 0.4.2 - 02/25/2016 - Reformat Header and add autocall parameter          **
 ******************************************************************************
 ******************************************************************************;
 
-%*****************************************************************************
-******************************************************************************
-** Version History:															**
-** 1.0.0 - 08/07/2014 - Original File 										**
-** 1.0.1 - 08/08/2014 - Fixed Bugs and Added Parsing and Addition of Fields	**
-** 1.1.0 - 08/09/2014 - Add local, Add DATASET								**
-** 1.2.0 - 08/13/2014 - Add Phone Parsing									**
-** 1.2.1 - 08/13/2014 - Debug												**
-** 1.3.0 - 09/03/2014 - Add MACRO Checks and Zip Code Numeric Checks 		**
-** 1.4.0 - 09/04/2014 - Completely Re-Wrote Name Parsing Logic 				**
-** 1.4.1 - 09/09/2014 - Added MACRO Checks for Array and Do_Over			**
-******************************************************************************
-******************************************************************************;
-
-%macro Name_Map_Beta(dataset=,first=,last=,address1=,address2=,city=,st=, zip5=,plus4=,phone=,area_code=);
-%****************
-*I. DEFAULTS	*
-*****************;
+%macro Name_Map_Beta(dataset=, first=, last=, address1=, address2=, city=, st=, zip5=, plus4=, phone=, area_code=, autocall=TRUE);
+%**********
+*I. SETUP *
+***********;
 
 	%*A. Local MACRO Variables;
 
-		%local dataset data lib first last address1 address2 city st zip5 plus4 phone area_code null alpha _f _l _a1 _a2 _c _st _z5 _p4 _ph _ac _dsid _z5_pos _dsid2 _close _close2 _p4_pos _last1 _last2 _suffix;
+		%local dataset data lib first last address1 address2 city st zip5 plus4 phone area_code null alpha _f _l _a1 _a2 _c _st _z5 _p4 _ph _ac _dsid _z5_pos _dsid2 _close _close2 _p4_pos _last1 _last2 _suffix autocall;
 
-	%*B. Null;
+	%*B. MACROS;
+	
+		%if %upcase(&autocall) ne TRUE and %upcase(&autocall) ne T
+		%then
+			%macro_check(dataset data_error array do_over remove_labels capitalize);
+	
+	%*C. Null;
 
 		%let null = ;
 
-	%*C. Alpha;
+	%*D. Alpha;
 
-		%let alpha = %str(ABCDEFGHIJKLMNOPQRSTUVWXYZ %');
+		%let alpha = %str(ABCDEFGHIJKLMNOPQRSTUVWXYZ %'');
 
-	%*D. Last Name Prefix 1;
+	%*E. Last Name Prefix 1;
 
 		%let _last1 = %str("MC", "DE", "DEL", "LA", "DI", "DA", "VAN", "SAN", "LE", "ST", "LOS", "MAC");
 
-	%*E. Last Name Prefix 2;
+	%*F. Last Name Prefix 2;
 
 		%let _last2 = %str("LA", "MC", "DI", "MAC");
 
-	%*F. Suffix;
+	%*G. Suffix;
 
 		%let _suffix = %str("SR", "JR", "III", "IV", "II");
 
-%************
-*II. MACROS	*
-*************;
-
-	%*A. Dataset;
-	
-		%if %sysmacexist(dataset) = 0
-		%then
-			%do;
-				%include "T:\MKG\MACROS\GENERAL\dataset.sas";
-				%N_E_W(MACRO Dataset Compiled, type=N);
-			%end;
-
-	%*B. Data_Error;
-	
-		%if %sysmacexist(data_error) = 0
-		%then
-			%do;
-				%include "T:\MKG\MACROS\GENERAL\Control MACROS\data_error.sas";
-				%N_E_W(MACRO Data_Error Compiled, type=N);
-			%end;
-
-	%*C. Remove Labels;
-
-		%if %sysmacexist(remove_labels_beta) = 0
-		%then
-			%do;
-				%include "T:\MKG\MACROS\GENERAL\BETA\remove_labels_beta.sas";
-				%N_E_W(MACRO Remove_Labels_Beta Compiled, type=N);
-			%end;
-
-	%*D. Capitalize;
-
-		%if %sysmacexist(capitalize) = 0
-		%then
-			%do;
-				%include "T:\MKG\MACROS\GENERAL\capitalize.sas";
-				%N_E_W(MACRO Capitalize Compiled, type=N);
-			%end;
-
-	%*E. Array;
-
-		%if %sysmacexist(array) = 0
-		%then
-			%do;
-				%include "T:\MKG\MACROS\GENERAL\array.sas";
-				%N_E_W(MARCO Array Compiled, type=N);
-			%end;
-
-	%*F. Do_Over;
-
-		%if %sysmacexist(do_over) = 0
-		%then
-			%do;
-				%include "T:\MKG\MACROS\GENERAL\do_over.sas";
-				%N_E_W(MACRO Do_Over Compiled, type=N);
-			%end;
-
-%********************
-*III. PARAMETERS	*
-*********************;
+%****************
+*II. PARAMETERS *
+*****************;
 
 	%*A. Dataset;
 
-		%dataset(&dataset);
+		%dataset(&dataset, autocall = &autocall);
 
 	%*B. First;
 
@@ -218,9 +163,9 @@
 			%let
 				_ph = 0;
 
-%************
-*IV. MODIFY	*
-*************;
+%*************
+*III. MODIFY *
+**************;
 
 	%*A. Zipcode Parse;
 
@@ -750,10 +695,10 @@
 
 	%*G. Remove Labels;
 
-		%remove_labels_beta(dataset=&lib..&data);
+		%remove_labels(dataset=&lib..&data, autocall = &autocall);
 
 	%*H. Capitalize;
 
-		%capitalize(&lib..&data);
+		%capitalize(&lib..&data, autocall = &autocall);
 
 %mend Name_Map_Beta;

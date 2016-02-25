@@ -1,24 +1,28 @@
 %*****************************************************************************
 ******************************************************************************
-** MACRO: ID																**
-** Purpose:	Add an ID to each Record with Prefix and Number	 				**
-** Created: 02/07/2014														**
-** Created by: Matthew Kelliher-Gibson										**
-** Last Modified: 07/31/2014												**
-** Stage: Live																**
-** Parameters:																**
-**		Prefix -		Three Characters to Precede Number					**
-**		Dataset -		Dataset to have ID added							**
-**		Zero -	(YES)	If counting will start at 0							**
-**		Count - 	 	Starting Count (only when ZERO=NO)					**
-** MACROS Used: 															**
-**		%N_E_W																**
-**		%Data_Error															**
-**		%Repeat																**
+** MACRO: ID                                                                **
+** Description:	Add an ID to each Record with Prefix and Number             **
+** Created: 02/07/2014                                                      **
+** Created by: Matthew Kelliher-Gibson                                      **
+** Parameters:                                                              **
+**    Prefix:          Three Characters to Precede Number                   **
+**    Dataset:         Dataset to have ID added                             **
+**    Zero (YES):      If counting will start at 0                          **
+**    Count:           Starting Count (only when ZERO=NO)                   **
+**    autocall (TRUE): Indicates if an autocall library is being used       **
+** MACROS Used:                                                             **
+**    %N_E_W                                                                **
+**    %Data_Error                                                           **
+**    %Repeat                                                               **
+**    %Macro_Check                                                          **
+******************************************************************************
+** Version History:                                                         **
+** 0.1.0 - 07/31/2014 - Inital File Creation                                **
+** 0.1.1 - 02/25/2016 - Update Format and Addd autocall parameter           **
 ******************************************************************************
 ******************************************************************************;
 
-%macro ID(dataset=,prefix=,zero=YES,count=)
+%macro ID(dataset=,prefix=,zero=YES,count=,autocall=TRUE)
 			/* / store source des= "Adds ID"*/;
 
 %************
@@ -33,9 +37,15 @@
 
 		%*2. Local;
 
-			%local prefix dataset zero start count null _z;
+			%local prefix dataset zero start count null _z autocall;
 
-	%*B. Defaults;
+	%*B. MARCOS;
+	
+		%if %upcase(&autocall) ne TRUE and %if %upcase(&autocall) ne T
+		%then
+			%macro_check(N_E_W data_error repeat);
+			
+	%*C. Defaults;
 
 		%*1. Null;
 
@@ -43,9 +53,7 @@
 
 
 %put ;
-%put ;
-%N_E_W(Begin MACRO ID Process, type=N);
-%put ;
+%N_E_W(Begin MACRO ID Process, type=N, autocall = &autocall);
 %put ;
 
 %N_E_W(Prefix Set to "&prefix", type=N);
@@ -54,7 +62,7 @@
 %N_E_W(File to be Processes is %upcase(&dataset), type=N);
 %put ;
 
-	%*C. Check for ZERO and COUNT;
+	%*D. Check for ZERO and COUNT;
 
 		%if %upcase(&zero) = YES and &count ~= &null
 		%then
@@ -63,7 +71,7 @@
 				%return;
 			%end;
 
-	%*D. Determine COUNT;
+	%*E. Determine COUNT;
 
 		%if %upcase(&zero)=YES
 			%then 
@@ -123,7 +131,5 @@
 		%put ;
 
 %N_E_W(MACRO ID Process Complete!, type=N);
-%put ;
-%put ;
 
 %mend ID;
