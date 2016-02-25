@@ -1,33 +1,46 @@
-%*****************************************************************
-******************************************************************
-** MACRO: Capitalize                                            **
-** Description:	Capitalize All Variable Values in a Dataset     **
-** Created: 04/02/2014                                          **
-** Created by: Matthew Kelliher-Gibson                          **
-** Parameters:                                                  **
-**    Data:  Dataset to have all variables capitalized          **
-**    _autocall (TRUE):  If FALSE all MACROS must be compiled   **
-** MACROS Used:                                                 **
-**    %N_E_W                                                    **
-**    %data_error                                               **
-******************************************************************
-** Version History:                                             **
-** 0.1.0 - 04/02/2014 - Original File                           **
-** 0.1.1 - 07/31/2014 - Add MACRO N_E_W                         **
-** 0.1.2 - 10/15/2014 - Add MACRO Data_Error                    **
-** 0.1.3 - 02/19/2016 - Add Autocall and and %local             **
-******************************************************************
-******************************************************************;
+%********************************************************************
+*********************************************************************
+** MACRO: Capitalize                                               **
+** Description:	Capitalize All Variable Values in a Dataset        **
+** Created: 04/02/2014                                             **
+** Created by: Matthew Kelliher-Gibson                             **
+** Parameters:                                                     **
+**    data:  Dataset to have all variables capitalized             **
+**    autocall (TRUE):  Logical, indicates use of autocall library **
+** MACROS Used:                                                    **
+**    %N_E_W                                                       **
+**    %data_error                                                  **
+*********************************************************************
+** Version History:                                                **
+** 0.1.0 - 04/02/2014 - Original File                              **
+** 0.1.1 - 07/31/2014 - Add MACRO N_E_W                            **
+** 0.1.2 - 10/15/2014 - Add MACRO Data_Error                       **
+** 0.1.3 - 02/19/2016 - Add Autocall and and %local                **
+** 0.1.4 - 02/25/2016 - Minor autocall fix and reformatting        **
+*********************************************************************
+*********************************************************************;
 
 %macro capitalize(data, _autocall=TRUE)
 			/* / store source des= "Capitalizes All Values in Dataset"*/;
-			
-	%local data _autocall;
+
+%**********
+*I. SETUP *
+***********;
+
+	%*A. Local Variables;
 	
-	%if &_autocall ne TRUE and &_autocall ne T
-	%then
-		%macro_check(N_E_W data_error);
-		
+		%local data autocall;
+	
+	%*B. MACROS;
+	
+		%if &autocall ne TRUE and &autocall ne T
+		%then
+			%macro_check(N_E_W data_error);
+	
+%****************
+*II. CAPITALIZE *
+*****************;
+	
 	data &data;
 		set &data;
 		array vars(*) _CHARACTER_;/* THIS ARRAY GROUPS ALL THE CHARACTER VARIABLES TOGETHER INTO ONE ARRAY */
@@ -39,5 +52,5 @@
 
 	%data_error;
 
-	%N_E_W(All Character Variables have been Capitalized!, type=N);
+	%N_E_W(All Character Variables have been Capitalized!, type=N, autocall = &autocall);
 %mend capitalize;

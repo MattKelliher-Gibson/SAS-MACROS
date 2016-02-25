@@ -10,7 +10,7 @@
 **		pct:				  Percentile to Cap Variables at                          **
 **		report (YES): If Histograms should be printed                         **
 **		file:				  File location to save PDF of histograms                 **
-**     _autocall (TRUE):  If FALSE all MACROS must be compiled              **
+**    autocall (TRUE):  If FALSE all MACROS must be compiled              **
 ** MACROS Used:                                                             **
 **		%data_error                                                           **
 **		%N_E_W                                                                **
@@ -19,21 +19,22 @@
 ** 0.1.0 - 02/12/2014 - Original File Created															  **
 ** 0.1.1 - 08/10/2015 - Added Formatting							 									    **
 ** 0.1.2 - 02/19/2016 - Fix Formatting and Add Autocall											**
+** 0.1.3 - 02/25/2016 - Minor autocall fix                                  **
 ******************************************************************************
 ******************************************************************************;
 
-%macro Cap_Loop(dataset=, vars=, pct=, report=YES, file=, _autocall=TRUE);
+%macro Cap_Loop(dataset=, vars=, pct=, report=YES, file=, autocall=TRUE);
 %***********
 *I. SETUP  *
 ************;
 
 	%*A. Local Variables;
 	
-		%local dataset vars file pct report _words _var i _pct _autocall;
+		%local dataset vars file pct report _words _var i _pct autocall;
 
 	%*B. MACROS;
 	
-		%if %upcase(&_autocall) ne TRUE and %upcase(&_autocall) ne T
+		%if %upcase(&autocall) ne TRUE and %upcase(&autocall) ne T
 		%then
 			%macro_check(data_error, N_E_W);
 	
@@ -41,7 +42,7 @@
 	
 		%let _words = %sysfunc(countw(&vars));
 
-		%N_E_W(Total Variables to Cap is: &_words, type=N);
+		%N_E_W(Total Variables to Cap is: &_words, type=N, autocall = &autocall);
 
 %***************
 *II. CAP LOOP  *

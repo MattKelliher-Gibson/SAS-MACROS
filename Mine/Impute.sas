@@ -1,32 +1,30 @@
 %*****************************************************************************
 ******************************************************************************
-** MACRO: IMPUTE															**
-** Purpose:	Impute Numeric Variables with Missing Values			 		**
-** Created: 09/09/2014														**
-** Created by: Matthew Kelliher-Gibson										**
-** Last Modified: 10/27/2014												**
-** Stage: Live																**
-** Parameters:																**
-**		Dataset -		Dataset with Appended Variables						**
-**		Final -			Name of Final Dataset								**
-** MACROS Used: 															**
-**		%N_E_W																**
-**		%Data_Error															**
-**		%Repeat																**
-**		%Time																**
-**		%Final_Time															**
+** MACRO: IMPUTE                                                            **
+** Description:	Impute Numeric Variables with Missing Values                **
+** Created: 09/09/2014                                                      **
+** Created by: Matthew Kelliher-Gibson                                      **
+** Parameters:                                                              **
+**    dataset:         Dataset with Appended Variables                      **
+**    final:           Name of Final Dataset                                **
+**    autocall (TRUE): Logical, indicates the use of an autocall library    **
+** MACROS Used:                                                             **
+**    %Data_Error                                                           **
+**    %Dataset                                                              **
+**    %Time                                                                 **
+**    %Final_Time                                                           **
+**    %Macro_Check                                                          **
+**    %Array                                                                **
+**    %Do_Over                                                              **
+******************************************************************************
+** Version History:                                                         **
+** 0.1.0 - 09/09/2014 - Original File                                       **
+** 0.1.1 - 10/27/2014 - Added Times                                         **
+** 0.1.2 - 02/25/2016 - Reformatted Header and added autocall check         **
 ******************************************************************************
 ******************************************************************************;
 
-%*****************************************************************
-******************************************************************
-** Version History:												**
-** 1.0.0 - 09/09/2014 - Original File 							**
-** 1.0.1 - 10/27/2014 - Added Times								**
-******************************************************************
-******************************************************************;
-
-%macro impute_beta(dataset=, final=);
+%macro impute_beta(dataset=, final=, autocall=TRUE);
 
 %************
 *I. SETUP	*
@@ -34,56 +32,15 @@
 
 	%*A. Check MACROS;
 
-		%*1. N_E_W;
-
-			%if %sysmacexist(N_E_W) = 0
-			%then
-				%do;
-					%include "T:\MKG\MACROS\GENERAL\N_E_W.sas";
-					%N_E_W(MACRO N_E_W Compiled, Type=N);
-				%end;
-
-		%*2. Data_Error;
-
-			%if %sysmacexist(data_error) = 0
-			%then
-				%do;
-					%include "T:\MKG\MACROS\GENERAL\Control MACROS\data_error.sas";
-					%N_E_W(MACRO Data_Error Compiled, Type=N);
-				%end;
-
-		%*3. Dataset;
-
-			%if %sysmacexist(dataset) = 0
-			%then
-				%do;
-					%include "T:\MKG\MACROS\GENERAL\dataset.sas";
-					%N_E_W(MACRO Dataset Compiled, Type=N);
-				%end;
-
-		%*4. Time;
-
-			%if %sysmacexist(time) = 0
-			%then
-				%do;
-					%include "T:\MKG\MACROS\GENERAL\support macros\time.sas";
-					%N_E_W(MACRO Time Compiled, Type=N);
-				%end;
-
-		%*5. Final_Time;
-
-			%if %sysmacexist(final_time) = 0
-			%then
-				%do;
-					%include "T:\MKG\MACROS\GENERAL\support macros\final_time.sas";
-					%N_E_W(MACRO Final_Time Compiled, Type=N);
-				%end;
+		%if %upcase(&autocall) ne TRUE and %upcase(&autocall) ne T
+		%then	
+			%macro_check(data_error dataset time final_time array do_over);
 
 	%*B. Default Values;
 
 		%*1. Local Variables;
 
-			%local dataset data lib _vars _time _date;
+			%local dataset data lib _vars _time _date autocall;
 
 	%*C. Time;
 
@@ -91,7 +48,7 @@
 
 	%*D. Check Dataset;
 
-		%dataset(&dataset);
+		%dataset(&dataset, autocall = &autocall);
 
 %************
 *II. IMPUTE	*

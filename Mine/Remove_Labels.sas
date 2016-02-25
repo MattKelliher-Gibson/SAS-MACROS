@@ -1,21 +1,25 @@
 %*****************************************************************************
 ******************************************************************************
-** MACRO: Remove_Labels														**
-** Purpose:	Remove Labels from all Variables				 				**
-** Created: 04/02/2014														**
-** Created by: Matthew Kelliher-Gibson										**
-** Last Modified: 08/22/2014												**
-** Stage: BETA																**
-** Parameters:																**
-**		Dataset -		Dataset to Remove Labels							**
-** MACROS Used: 															**
-**		%N_E_W																**
-**		%Data_Error															**
-**		%Dataset															**
+** MACRO: Remove_Labels                                                     **
+** Description:	Remove Labels from all Variables                            **
+** Created: 04/02/2014                                                      **
+** Created by: Matthew Kelliher-Gibson                                      **
+** Parameters:                                                              **
+**    dataset:  Dataset to Remove Labels                                    **
+**    autocall (TRUE):  Logical, indicates use of autocall library          **
+** MACROS Used:                                                             **
+**    %N_E_W                                                                **
+**    %Data_Error                                                           **
+**    %Dataset                                                              **
+**    %Macro_Check                                                          **
 ******************************************************************************
+** Version History:                                                         **
+** 0.1.0 - 04/02/2014 - Inital File                                         **
+** 0.1.1 - 08/22/2016 - Misc Updates                                        **
+** 0.1.2 - 02/25/2016 - Reformating and add autocall parameter              **
 ******************************************************************************;
 
-%macro remove_labels(dataset)
+%macro remove_labels(dataset, autocall=TRUE)
 			/* / store source des= "Removes All Labels from Dataset"*/;
 
 %********************
@@ -24,27 +28,23 @@
 
 	%*A. Local Variables;
 
-		%local dataset data lib abc numeric everything;
+		%local dataset data lib abc numeric everything autocall;
 
 	%*B. MACROS;
 
-		%if %sysmacexist(data_error) = 0
-		%then
-			%include "C:\SAS-MACROS\Mine\data_error.sas";;
+		%if %upcase(&autocall) ne TRUE and %upcase(&autocall) ne T
+		%then 
+			%macro_check(data_error dataset N_E_W);
 
-		%if %sysmacexist(dataset) = 0
-		%then
-			%include "C:\SAS-MACROS\Mine\DATASET.sas";;
-
-*************
+%*************
 *II. SETUP	*
 *************;
 
 	%*A. Parse Dataset;
 
-		%dataset(&dataset);
+		%dataset(&dataset, autocall = &autocall);
 
-*********************
+%*********************
 *III. REMOVE LABELS	*
 *********************;
 
@@ -60,6 +60,6 @@
 
 		%data_error;
 
-		%N_E_W(Labels have been Successfully Removed from|Dataset %upcase(&data)!, type=N);
+		%N_E_W(Labels have been Successfully Removed from|Dataset %upcase(&data)!, type=N, autocall = &autocall);
 
 %mend remove_labels;

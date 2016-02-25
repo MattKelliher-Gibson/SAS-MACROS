@@ -5,14 +5,17 @@
 ** Created: 08/09/2014                                                      **
 ** Created by: Matthew Kelliher-Gibson                                      **
 ** Parameters:                                                              **
-**		Dataset -	Dataset Name to be Parsed                                   **
-**                **Lib and Data MUST be GLOBAL Variables                   **
+**    dataset:  Dataset Name to be Parsed                                   **
+**              **Lib and Data MUST be GLOBAL Variables                     **
+**    autocall (TRUE): Logical, indicates use of autocall library           **
 ** MACROS:                                                                  **
-**		%N_E_W                                                                **
+**    %N_E_W                                                                **
+**    %Macro_Check                                                          **
 ******************************************************************************
 ** Version History:                                                         **
 ** 0.1.0 - 08/09/2014 - Inital File                                         **
 ** 0.1.1 - 02/19/2016 - Add Autocall and fix formatting                     **
+** 0.1.2 - 02/25/2016 - Fix local variable problem and add autocall         **
 ******************************************************************************;
 
 %macro Dataset(dataset);
@@ -20,9 +23,15 @@
 *I. MACRO VARIABLES	*
 *********************;
 
-	%*A. Delcare Macro Variable Local;
+	%*A. Local Variables;
 
-		%local dataset lib data;
+		%local dataset autocall;
+		
+	%*B. MACROS;
+		
+		%if %upcase(&autocall) ne TRUE and %upcase(&autocall) ne T
+		%then
+			%macro_check(N_E_W);
 
 %****************
 *II. DATASET	*
