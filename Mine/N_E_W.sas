@@ -5,61 +5,63 @@
 ** Created: 07/29/2014                                              **
 ** Created by: Matthew Kelliher-Gibson                              **
 ** Parameters:                                                      **
-**     Text:    Message to Appear in Log                            **
-**     Type:    Type of Message:                                    **
+**     text:    Message to Appear in Log                            **
+**     type:    Type of Message:                                    **
 **                 N or NOTE                                        **
 **                 E or ERROR                                       **
 **                 W or WARNING                                     **
-**     Delim: (|)    Character to Indicate Carriage Returns         **
-**      _autocall (TRUE):  If FALSE all MACROS must be compiled     **
+**     delim: (|)    Character to Indicate Carriage Returns         **
+**     autocall (TRUE):  If FALSE all MACROS must be compiled     **
 ** MACROS Used:                                                     **
 **     %Repeat                                                      **
 **********************************************************************
 ** Version History:                                                 **
-** 1.0.0 - 07/29/2014 - Original File Created                       **
-** 1.0.1 - 07/30/2014 - Minor Updates                               **
-** 1.0.2 - 09/08/2014 - Bug Fix                                     **
-** 1.0.3 - 01/25/2016 - Changed MACRO directory                     **
-** 1.0.4 - 02/17/2016 - Added Extra Spacing                         **
-** 1.0.5 - 02/19/2016 - Corrected autocall logic                    **
-** 1.0.6 - 02/19/2016 - Revert Back to Original autocall logic      **
+** 0.1.0 - 07/29/2014 - Original File Created                       **
+** 0.1.1 - 07/30/2014 - Minor Updates                               **
+** 0.1.2 - 09/08/2014 - Bug Fix                                     **
+** 0.1.3 - 01/25/2016 - Changed MACRO directory                     **
+** 0.1.4 - 02/17/2016 - Added Extra Spacing                         **
+** 0.1.5 - 02/19/2016 - Corrected autocall logic                    **
+** 0.1.6 - 02/19/2016 - Revert Back to Original autocall logic      **
+** 0.1.7 - 02/25/2016 - Minor autocall fix and formatting           **
 **********************************************************************
 **********************************************************************;
 
-%macro N_E_W(text, type=, delim=|, _autocall = TRUE)
+%macro N_E_W(text, type=, delim=|, autocall = TRUE)
 									/* / store source des= "Adds Custom NOTE, ERROR, and WARNING Messages to Log"*/;
 									
-%**************
-*0. AUTOCALL  *
-***************;
 
-	%local _autocall;
 	
-	%if %upcase(&_autocall) ne TRUE and %upcase(&_autocall) ne T
-	%then 
-		%Macro_check(repeat);
 	
-%********************
-*I. DEFAULT VALUES  *
-*********************;
+%**********
+*I. SETUP *
+***********;
 
-	%*A. Declare MACRO Variables Local;
+	%*A. Local Variables;
 
-		%local text type delim null i _n;
+		%local text type delim null i _n autocall;
 
-	%*B. Null;
+	%*B. MACROS;
+	
+		%if %upcase(&_autocall) ne TRUE and %upcase(&_autocall) ne T
+		%then 
+			%Macro_check(repeat);
+	
+	%*C. Variables;
+	
+		%*1. Null;
 
-		%let null = ;
+			%let null = ;
 
-	%*C. Delimintor;
+		%*2. Delimintor;
 
-		%let delim = %bquote(&delim);
+			%let delim = %bquote(&delim);
 
-	%*D. Number of Lines in Message (_n);
+		%*3. Number of Lines in Message (_n);
 
-		%let _n = %sysevalf(%sysfunc(countc(&text, &delim))+1);
+			%let _n = %sysevalf(%sysfunc(countc(&text, &delim))+1);
 
-	%*E. Message Type;
+	%*D. Message Type;
 
 		%if 
 			%upcase(&type) = N or

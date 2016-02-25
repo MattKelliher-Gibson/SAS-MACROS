@@ -1,4 +1,4 @@
-**************************************************************
+%*********************************************************************
 **********************************************************************
 ** MACRO: Decile                                                    **
 ** Purpose: To sort data and assigns to equal                       **
@@ -16,6 +16,17 @@
 **    S_Decile (SITE_DECILE):  Variable name for group by           **
 **                               assignment                         **
 **    Number_of_Groups:  Number of groups to be assigned            **
+**    autocall:  Logical, indicates use of autocall library         **
+** MACROS:                                                          **
+**    %N_E_W                                                        **
+**    %Dataset                                                      **
+**    %Terminate                                                    **
+**    %Data_Error                                                   **
+**    %Array                                                        **
+**    %Do_Over                                                      **
+**    %Time                                                         **
+**    %Final_Time                                                   **
+**    %Macro_Check                                                  **
 **********************************************************************
 ** Version History:                                                 **
 ** 0.1.0 - 02/11/2014 - Original File                               **
@@ -24,128 +35,73 @@
 ** 0.2.2 - 04/30/2014 - Added MACRO Windows and Parameter Checks    **
 ** 0.2.3 - 10/29/2014 - Added MACRO Calls and Minor Updates         **
 ** 0.2.4 - 02/19/2016 - Formatting Fixed                            **
+** 0.2.5 - 02/25/2016 - Updates, add %local, and autocall addition  **
 **********************************************************************
 **********************************************************************;
 
-%macro Decile_beta(dataset=, target=P_target1, decile=GLOBAL_DECILE, SITE=NO, branch=branch, s_decile=SITE_DECILE, number_of_groups=10)
+%macro Decile(dataset=, target=P_target1, decile=GLOBAL_DECILE, site=NO, branch=branch, s_decile=SITE_DECILE, number_of_groups=10, autocall = TRUE)
 				/* / store source des= "Divides File into Ordered Groups (Usually Deciles)"*/;
-%*A. MACROS;
+%**********
+*I. SETUP *
+***********;
 
-	%*1. N_E_W;
+	%*A. Local Variables;
+	
+		%local dataset target decile site site branch s_decile number_of_groups autocall target_new site_new number_of_groups_new target_exist branch_exist zz total i;
 
-		%if %sysmacexist(N_E_W) = 0
+	%*B. MACROS;
+	
+		%if %upcase(&autocall) ne TRUE and %upcase(&autocall) ne T
 		%then
-			%do;
-				%inc "T:\MKG\MACROS\GENERAL\N_E_W.sas";
-				%N_E_W(MACRO N_E_W Compiled!, type=N);
-			%end;
+			%macro_check(N_E_W dataset terminate data_error array do_over time final_time);
 
-	%*2. Dataset;
+	%*C. Default Variables;
+	
+		%*1. NULL;
+	
+			%let null= ;
+			
+	%*D. MACRO Windows;
 
-		%if %sysmacexist(dataset) = 0
-		%then
-			%do;
-				%inc "T:\MKG\MACROS\GENERAL\dataset.sas";
-				%N_E_W(MACRO Dataset Compiled!, type=N);
-			%end;
+		%*1. Target;
 
-	%*3. Terminate;
+			%window target_check
+				#3 @5 "ERROR!" color=red
+				#5 @5 "You Did NOT Enter a variable for TARGET!" color=red
+				#7 @5 "Please Enter a TARGET variable and press [ENTER]."
+				#9 @5 target_new 10 attr=underline color=blue
+				#11 @5 "OR leave blank and press [ENTER] to ABORT."
+			;
 
-		%if %sysmacexist(terminate) = 0
-		%then
-			%do;
-				%inc "T:\MKG\MACROS\GENERAL\control macros\terminate.sas";
-				%N_E_W(MACRO Terminate Compiled!, type=N);
-			%end;
+		%*2. Site;
 
-	%*4. Data Error;
+			%window site_check
+				#3 @5 "SITE Decile is currently set to" +2 site 3 attr=underline protect=yes +1 "."
+				#5 @5 "If you would like to change SITE Decile type new value below and press [ENTER]."
+				#7 @5 site_new 3 attr=underline color=blue
+				#9 @5 "OR to keep current settings leave blank and press [ENTER]."
+			;
 
-		%if %sysmacexist(data_error) = 0
-		%then
-			%do;
-				%inc "T:\MKG\MACROS\GENERAL\control macros\data_error.sas";
-				%N_E_W(MACRO Data_Error Compiled!, type=N);
-			%end;
+		%*3. Number of Groups;
 
-	%*5. Array;
-
-		%if %sysmacexist(array) = 0
-		%then
-			%do;
-				%inc "T:\MKG\MACROS\GENERAL\array.sas";
-				%N_E_W(MACRO Array Compiled!, type=N);
-			%end;
-
-	%*6. Do Over;
-
-		%if %sysmacexist(do_over) = 0
-		%then
-			%do;
-				%inc "T:\MKG\MACROS\GENERAL\do_over.sas";
-				%N_E_W(MACRO Do_Over Compiled!, type=N);
-			%end;
-
-	%*7. Time;
-
-		%if %sysmacexist(time) = 0
-		%then
-			%do;
-				%inc "T:\MKG\MACROS\GENERAL\support macros\time.sas";
-				%N_E_W(MACRO Time Compiled!, type=N);
-			%end;
-
-	%*8. Final Time;
-
-		%if %sysmacexist(final_time) = 0
-		%then
-			%do;
-				%inc "T:\MKG\MACROS\GENERAL\support macros\final_time.sas";
-				%N_E_W(MACRO Final_Time Compiled!, type=N);
-			%end;
+			%window groups_check
+				#3 @5 "NUMBER of GROUPS is currently set to" +2 number_of_groups 2 attr=underline protect=yes +1 "."
+				#5 @5 "If you would like to change NUMBER of GROUPS type new value below and press [ENTER]."
+				#7 @5 number_of_groups_new 2 attr=underline color=blue
+				#9 @5 "OR to keep current settings leave blank and press [ENTER]."
+			;
 
 	%time(Decile);
 
-%*B. MACRO Windows;
+%*********************
+*II. PARAMETER CHECK *
+**********************;
 
-	%*1. Set NULL;
+	%*A. Dataset;
 
-		%let null= ;
+		%dataset(&dataset, autocall = &autocall);
 
-	%*2. Target;
-
-		%window target_check
-			#3 @5 "ERROR!" color=red
-			#5 @5 "You Did NOT Enter a variable for TARGET!" color=red
-			#7 @5 "Please Enter a TARGET variable and press [ENTER]."
-			#9 @5 target_new 10 attr=underline color=blue
-			#11 @5 "OR leave blank and press [ENTER] to ABORT."
-		;
-
-	%*3. Site;
-
-		%window site_check
-			#3 @5 "SITE Decile is currently set to" +2 site 3 attr=underline protect=yes +1 "."
-			#5 @5 "If you would like to change SITE Decile type new value below and press [ENTER]."
-			#7 @5 site_new 3 attr=underline color=blue
-			#9 @5 "OR to keep current settings leave blank and press [ENTER]."
-		;
-
-	%*4. Number of Groups;
-
-		%window groups_check
-			#3 @5 "NUMBER of GROUPS is currently set to" +2 number_of_groups 2 attr=underline protect=yes +1 "."
-			#5 @5 "If you would like to change NUMBER of GROUPS type new value below and press [ENTER]."
-			#7 @5 number_of_groups_new 2 attr=underline color=blue
-			#9 @5 "OR to keep current settings leave blank and press [ENTER]."
-		;
-
-%*B. Pre Check;
-
-	%*1. Dataset;
-
-		%dataset(&dataset);
-
-	%*2. Target;
+	%*B. Target;
 
 		%if &target = &null
 			%then 
@@ -178,14 +134,14 @@
 					%if &target_exist = 0
 						%then 
 							%do; /* ABORT DO */
-								%put ERROR: Variable &target does NOT Exist in Dataset &dataset;
+								%N_E_W(Variable &target does NOT Exist in Dataset &dataset, type=E, autocall = &autocall);
 								%abort;
 							%end; /* ABORT DO */
 						%else
-							%put NOTE: Variable &target exists on Dataset &dataset;
+							%N_E_W(Variable &target exists on Dataset &dataset, type = N);
 				%end; /* TARGET EXIST DO */
 
-	%*3. Site;
+	%*C. Site;
 /*		
 		%Display site_check;
 
@@ -193,7 +149,7 @@
 			%then
 				%let site = %upcase(&site_new);
 */
-	%*4. Branch;
+	%*D. Branch;
 
 		%if &site = YES
 			%then
@@ -209,14 +165,14 @@
 					%if &branch_exist = 0
 						%then
 							%do;
-								%put ERROR: Variable &branch does NOT Exist in Dataset &dataset;
+								%N_E_W(Variable &branch does NOT Exist in Dataset &dataset, type = E);
 								%abort;
 							%end;
 						%else
-							%put NOTE: Variable &branch exists on Dataset &dataset;
+							%N_E_W(Variable &branch exists on Dataset &dataset, type = N);
 				%end;
 
-	%*5. Number of Groups;
+	%*E. Number of Groups;
 /*
 		%display groups_check;
 
@@ -224,7 +180,7 @@
 			%then
 				%let number_of_groups = &number_of_groups_new;
 */
-	%*6. List Parameters;
+	%*F. List Parameters;
 
 		%N_E_W(Dataset to be used is: &dataset|Target Varaible is: &target|Final Decile Variable will be called: &decile|
 				Creating Site Deciles: &site, type=N);
@@ -233,63 +189,65 @@
 				%N_E_W(Branch Variable to be used is: &branch|Final Site Decile Variable will be called: &s_decile, type=N);
 				
 		%N_E_W(Number of Groups to be assigned is: &number_of_groups, type=N);
-		%put;
+		
 		%N_E_W(BEGIN PROCESSING, type=N);
 
-%*C. Site Decile Check;
+	%*G. Site Decile Check;
 
-	%*1. Check if Site Deciles will be Used;
+		%*1. Check if Site Deciles will be Used;
 
-		%let SITE=%upcase(&site);
+			%let SITE=%upcase(&site);
 
-		%N_E_W(USING SITE DECILES?  &site, type=N);
+			%N_E_W(USING SITE DECILES?  &site, type=N);
 
-	%*2. Site Decile Prep;
+		%*2. Site Decile Prep;
 
-		%if &site = YES
-			%then
-				%do;
-					proc sql;
-						create table 
-							branches as
-						select 
-							distinct &branch as BRANCHES
-						from 
-							&dataset
-						;
-					quit;
+			%if &site = YES
+				%then
+					%do;
+						proc sql;
+							create table 
+								branches as
+							select 
+								distinct &branch as BRANCHES
+							from 
+								&dataset
+							;
+						quit;
 
-					%data_error;
+						%data_error;
 
-					%dataset(branches);
-				
+						%dataset(branches);
+					
 
-					proc sql noprint;
-						select 
-							count(*)
-						into 
-							:zz
-						from 
-							branches
-						;
-					quit;
+						proc sql noprint;
+							select 
+								count(*)
+							into 
+								:zz
+							from 
+								branches
+							;
+						quit;
 
-					%if %symexist(zz)=0 or &zz=&null or &zz=0
-						%then
-							%do;
-								%N_E_W(MUST HAVE MORE THAN ZERO BRANCHES!, type=E);
-								%return;
-							%end;
+						%if %symexist(zz)=0 or &zz=&null or &zz=0
+							%then
+								%do;
+									%N_E_W(MUST HAVE MORE THAN ZERO BRANCHES!, type=E);
+									%return;
+								%end;
 
-					%put NOTE: Number of Branches: &zz;
+						%N_E_W(Number of Branches: &zz, type = N);
 
-					%array(bra, data=branches, var=BRANCHES);
+						%array(bra, data=branches, var=BRANCHES);
 
-				%end;
+					%end;
 
-%*D. Deciles;
+%**************
+*III. Deciles *
+***************;
 
-	%*1. Sort by TARGET Variable;
+	%*A. Sort by TARGET Variable;
 
 		proc sort 
 			data=&dataset;
@@ -298,7 +256,7 @@
 
 		%data_error;
 
-	%*2. Calculate Total Records in Dataset and Store in MACRO Variable TOTAL;
+	%*B. Calculate Total Records in Dataset and Store in MACRO Variable TOTAL;
 
 		proc sql noprint;
 			select 
@@ -319,9 +277,9 @@
 					%return;
 				%end;
 
-		%put NOTE: Total records in file: &total;
+		%N_E_W(Total records in file: &total, type=N);
 
-	%*3. Prepare Number of Groups;
+	%*C. Prepare Number of Groups;
 
 		data number_of_groups;
 			do i=1 to &number_of_groups;
@@ -334,7 +292,7 @@
 
 		%array(splits, data=number_of_groups, var=x);
 
-	%*4. Assign Groups;
+	%*D. Assign Groups;
 
 		data &dataset;
 			set &dataset;
@@ -346,7 +304,7 @@
 
 		%data_error;
 
-	%*5. Assign Site Groups;
+	%*E. Assign Site Groups;
 
 		%if &site = YES
 			%then
@@ -369,7 +327,7 @@
 							;
 						quit;
 
-						%N_E_W(Number of Records in Branch &&bra&i:|&&T_&i;
+						%N_E_W(Number of Records in Branch &&bra&i:|&&T_&i, type=N);
 
 						proc sort 
 							data=_&i;
@@ -457,14 +415,14 @@
 							%end; /* FINAL DO */
 						%else
 							%do; /* ABORT */
-								%put ERROR: Datasets NOT Equal;
-								%put ERROR- &total Records in Original;
-								%put ERROR- &ll Records in Other;
+								%N_E_W(Datasets NOT Equal|&total Records in Original|&ll Records in Other, type = E);
 								%abort;
 							%end; /* ABORT DO */
 				%end; /* SITE DO */
 
-%*E. Reports;
+%*************
+*IV. REPORTS *
+**************;
 /*
 	%if &report= &null
 		%then 
@@ -501,16 +459,16 @@
 			
 %exit:*/
 
-%*F. Clean up;
+%*************
+*V. CLEAN UP *
+**************;
 
-	*1. Delete Tables;
+	%*A. Delete Tables;
 
 		proc delete
 			data=number_of_groups;
 		run;
 
-		%put ;
-		%N_E_W(PROCESSING SUCCESSFULLY COMPLETED|All Temporary Datasets and Variables Deleted, type=N);
-		%final_time()
-
-%mend Decile_Beta;
+	%N_E_W(PROCESSING SUCCESSFULLY COMPLETED|All Temporary Datasets and Variables Deleted, type=N);
+	%final_time()
+%mend Decile;

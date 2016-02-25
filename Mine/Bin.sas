@@ -13,7 +13,7 @@
 **		Max (10):        Maximum Number of Bins       **
 **		Debug (FALSE):   If TRUE then dataset _freq_  **
 **                     is not deleted               **
-**     _autocall (TRUE):  If FALSE all MACROS       **
+**    autocall (TRUE):  If FALSE all MACROS         **
 **                        must be compiled          **
 ** MACROS:                                          **
 **		%N_E_W                                        **
@@ -27,18 +27,19 @@
 ** 0.2.0 - 10/28/2014 - Re-Wrote to Optimal Bin     **
 ** 0.2.1 - 12/10/2014 - Added Max Parameter         **
 ** 0.2.2 - 02/19/2016 - Add Autocall and fix header **
+** 0.2.3 - 02/25/2016 - Minor autocall fix          **
 ******************************************************
 ******************************************************;
 
 
-%macro Bin(dataset=, target=target, bin=Bin, var=, final=, max=10, debug=FALSE, _autocall = TRUE);
+%macro Bin(dataset=, target=target, bin=Bin, var=, final=, max=10, debug=FALSE, autocall = TRUE);
 %************
 *I. SETUP	*
 *************;
 
 	%*A. Local Variables;
 	
-		%local dataset target bin var final _time _date debug _autocall;
+		%local dataset target bin var final _time _date debug autocall;
 
 	%*B. Variables;
 	
@@ -48,7 +49,7 @@
 
 	%*C. MACROS;
 
-		%if %upcase(&_autocall) ne TRUE and %upcase(&_autocall) ne T
+		%if %upcase(&autocall) ne TRUE and %upcase(&autocall) ne T
 		%then
 			%macro_check(N_E_W data_error dataset array do_over time final_time);
 
@@ -58,7 +59,7 @@
 
 	%*E. Check Dataset;
 
-		%dataset(&dataset);
+		%dataset(&dataset, autocall = &autocall);
 
 %************
 *II. BIN	*
@@ -159,7 +160,7 @@
 			%data_error;
 
 	%escape:
-	%N_E_W(Binning Process Complete!, type=N);
+	%N_E_W(Binning Process Complete!, type=N, autocall = &autocall);
 	%final_time;
 
 %mend Bin;

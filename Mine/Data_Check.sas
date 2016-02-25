@@ -1,30 +1,31 @@
-%*******************************************************************
-********************************************************************
-** MACRO: Data_Check                                              **
-** Description:	Checks if Dataset Name is valid and exists        **
-** Created: 10/15/2014                                            **
-** Created by: Matthew Kelliher-Gibson                            **
-** Parameters:                                                    **
-**		Dataset:            Dataset to Check                        **
-**     _autocall (TRUE):  If FALSE all MACROS                     **
-**                        must be compiled                        **
-** MACROS:                                                        **
-**		%N_E_W                                                      **
-********************************************************************
-** Version History:                                               **
-** 0.1.0 - 10/15/2014 - Original File Created                     **
-** 0.1.1 - 02/19/2016 - Add Header and Autocall                   **
-********************************************************************
-********************************************************************;
+%***********************************************************************
+************************************************************************
+** MACRO: Data_Check                                                  **
+** Description:	Checks if Dataset Name is valid and exists            **
+** Created: 10/15/2014                                                **
+** Created by: Matthew Kelliher-Gibson                                **
+** Parameters:                                                        **
+**		Dataset:            Dataset to Check                            **
+**    autocall (TRUE):    Logical, indicates use of autocall library  **
+** MACROS:                                                            **
+**		%N_E_W                                                          **
+**    %Macro_Check                                                    **
+************************************************************************
+** Version History:                                                   **
+** 0.1.0 - 10/15/2014 - Original File Created                         **
+** 0.1.1 - 02/19/2016 - Add Header and Autocall                       **
+** 0.1.2 - 02/25/2016 - Minor autocall fix                            **
+************************************************************************
+************************************************************************;
 
-%macro data_check(dataset, _autocall=TRUE);
+%macro data_check(dataset, autocall=TRUE);
 %************
 *I. SETUP	*
 *************;
 
 	%*A. Local Variables;
 
-		%local dataset data lib null _alphanumeric;
+		%local dataset data lib null _alphanumeric autocall;
 
 	%*B. Variables;
 
@@ -38,7 +39,7 @@
 
 	%*C. MACROS;
 	
-		%if &_autocall ne TRUE and &_autocall ne T
+		%if &autocall ne TRUE and &autocall ne T
 		%then
 			%macro_check(N_E_W);
 
@@ -51,8 +52,8 @@
 		%if &dataset = &null
 		%then
 			%do;
-				%N_E_W(No Dataset Provided, type=E);
-				%let error_check = 1;
+				%N_E_W(No Dataset Provided, type=E, autocall = &autocall);
+%*				%let error_check = 1;
 				%return;
 			%end;
 
@@ -64,7 +65,7 @@
 			%then
 				%do;
 					%N_E_W(Invalid Characters in Variable|Dataset: %upcase(&dataset), type=E);
-					%let error_check = 1;
+%*					%let error_check = 1;
 					%return;
 				%end;
 
