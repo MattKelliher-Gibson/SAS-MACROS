@@ -1,60 +1,52 @@
-%macro Control_beta(dataset=, seed=, total_mailing=, response_rate=, control_preselect=, branch=branch, effect=0.15, alpha=0.05, power=0.5);
-%*****************************************************************************
-******************************************************************************
-** MACRO: Control															**
-** Purpose:	Calculate and pull a control group				 				**
-**			for a dataset													**
-** Created: 02/12/2014														**
-** Created by: Matthew Kelliher-Gibson										**
-** Last Modified: 08/14/2014												**
-** Stage: BETA																**
-** Parameters:																**
-**		Dataset -			Input Dataset									**
-**		seed - 				Seed number for proc surveyselect				**
-**		total_mailing -		Total expected mailings for control				**
-**								calculation									**
-**		response_rate -		Expected response rate for mailings				**
-**		control_preselect -	Preselected Control Quantity					**
-**		branch - (branch) 	variable in dataset that inlcudes				**
-**								branch name or number (must be character)	**
-**		alpha - (.05) 		Type I Error allowance							**
-**		power - (.5) 		Type II Error allowance							**
-** MACROS Used:																**
-**		%Zero_Check															**
-**		%Data_Error															**
-**		%Invalid_Char_Loop													**
-**		%Invalid_Char_Window												**
-**		%Null																**
-**		%Null_Window														**
-**		%Stat_Check															**
-**		%Stat_Default_Window												**
-**		%Stat_Range_Window													**
-**		%Terminate															**
-**		%Repeat																**
-**		%N_E_W																**
-******************************************************************************
-******************************************************************************;
-
+%macro Control_beta(dataset=, seed=, total_mailing=, response_rate=, control_preselect=, branch=branch, effect=0.15, alpha=0.05, power=0.5, autocall = TRUE);
 %*********************************************************************************************************
 **********************************************************************************************************
-** Version History:																						**
-** 1.0.0 - 02/12/2014 - Original File Created															**
-** 2.0.0 - 04/23/2014 - Complete Re-write with Proc SureveySelect										**
-** 2.1.0 - 04/25/2014 - Added Quality Controls															**
-** 2.2.0 - 04/28/2014 - Added Control Function to Calaculate Control Group Size							**
-** 3.0.0 - 04/28/2014 - Added MACRO Windows for EFFECT and CONTROL_DATASET								**
-** 3.1.0 - 04/29/2014 - Added MACRO Windows for all other Parameters									**
-** 4.0.0 - 05/15/2014 - Changed calculation, added min/max, and added checks							**
-** 4.1.0 - 05/16/2014 - Added Branch Check and other improvements and fixes								**
-** 4.2.0 - 05/17/2014 - Change Control to flag instead of different dataset and MACRO Window updates	**
-** 4.2.1 - 05/18/2014 - Fixed errors, adding more parameter and data step checks						**
-** 5.0.0 - 06/06/2014 - Added Dynamic MACROs, added more parameter and data step/proc checks			**
-** 5.0.1 - 06/20/2014 - Fixed Minor Errors and Changed Custom NOTES, WARNING, and ERROR Messages		**
-** 5.0.2 - 06/23/2014 - Minor Fixes and Development Notes Added											**
-** 5.1.0 - 07/29/2014 - Replaced Notes/Errors/Warning Messages with N_E_W MACROS						**
-** 5.2.0 - 07/30/2014 - Moved MACROS to Separate Files and Replaced with Conditional %Includes			**
-** 5.2.1 - 08/13/2014 - Minor Updates and Clean up														**
-** 5.3.0 - 12/01/2014 - Added Control Pre-Selection Parameter											**
+** MACRO: Control                                                                                       **
+** Description:	Calculate and pull a control group from a dataset                                       **
+** Created: 02/12/2014                                                                                  **
+** Created by: Matthew Kelliher-Gibson                                                                  **
+** Parameters:                                                                                          **
+**    Dataset:    Input Dataset                                                                         **
+**    seed:    Seed number for proc surveyselect                                                        **
+**    total_mailing:    Total expected mailings for control calculation                                 **
+**    response_rate:    Expected response rate for mailings                                             **
+**    control_preselect:    Preselected Control Quantity                                                **
+**    branch (branch):    variable in dataset that inlcudes branch name or number (must be character)   **
+**    alpha (0.05):    Type I Error allowance                                                           **
+**    power (0.5):    Type II Error allowance                                                           **
+** MACROS Used:                                                                                         **
+**    %Zero_Check                                                                                       **
+**    %Data_Error                                                                                       **
+**    %Invalid_Char_Loop                                                                                **
+**    %Invalid_Char_Window                                                                              **
+**    %Null                                                                                             **
+**    %Null_Window                                                                                      **
+**    %Stat_Check                                                                                       **
+**    %Stat_Default_Window                                                                              **
+**    %Stat_Range_Window                                                                                **
+**    %Terminate                                                                                        **
+**    %Repeat                                                                                           **
+**    %N_E_W                                                                                            **
+**********************************************************************************************************
+** Version History:                                                                                     **
+** 0.1.0 - 02/12/2014 - Original File Created                                                           **
+** 0.2.0 - 04/23/2014 - Complete Re-write with Proc SureveySelect                                       **
+** 0.2.1 - 04/25/2014 - Added Quality Controls                                                          **
+** 0.2.2 - 04/28/2014 - Added Control Function to Calaculate Control Group Size                         **
+** 0.3.0 - 04/28/2014 - Added MACRO Windows for EFFECT and CONTROL_DATASET                              **
+** 0.3.1 - 04/29/2014 - Added MACRO Windows for all other Parameters                                    **
+** 0.4.0 - 05/15/2014 - Changed calculation, added min/max, and added checks                            **
+** 0.4.1 - 05/16/2014 - Added Branch Check and other improvements and fixes                             **
+** 0.4.2 - 05/17/2014 - Change Control to flag instead of different dataset and MACRO Window updates    **
+** 0.4.3 - 05/18/2014 - Fixed errors, adding more parameter and data step checks                        **
+** 0.5.0 - 06/06/2014 - Added Dynamic MACROs, added more parameter and data step/proc checks            **
+** 0.5.1 - 06/20/2014 - Fixed Minor Errors and Changed Custom NOTES, WARNING, and ERROR Messages        **
+** 0.5.2 - 06/23/2014 - Minor Fixes and Development Notes Added                                         **
+** 0.5.3 - 07/29/2014 - Replaced Notes/Errors/Warning Messages with N_E_W MACROS                        **
+** 0.5.4 - 07/30/2014 - Moved MACROS to Separate Files and Replaced with Conditional %Includes          **
+** 0.5.5 - 08/13/2014 - Minor Updates and Clean up                                                      **
+** 0.5.6 - 12/01/2014 - Added Control Pre-Selection Parameter                                           **
+** 0.5.7 - 02/25/2016 - Fixed Header Format and Added autocall parameter check for suppport MACROS      **
 **********************************************************************************************************
 **********************************************************************************************************;
 
@@ -202,77 +194,9 @@
 *II. MACROS	*
 *************;
 
-	%*A. Zero_Check;
-
-		%if %sysmacexist(zero_check) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\Zero_Check.sas";;
-
-	%*B. Terminate;
-
-		%if %sysmacexist(terminate) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\Terminate.sas";;
-
-	%*C. Invalid Character Window;
-
-		%if %sysmacexist(invalid_char_window) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\Invalid_Char_Window.sas";;
-
-	%*D. Invalid Character Loop;
-
-		%if %sysmacexist(Invalid_Char_Loop) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\Invalid_Char_Loop.sas";;
-
-	%*E. Null;
-
-		%if %sysmacexist(null) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\null.sas";;
-
-	%*F. Null_Window;
-
-		%if %sysmacexist(null_window) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\null_window.sas";;
-
-	%*G. Data_Error;
-
-		%if %sysmacexist(data_error) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\data_error.sas";;
-
-	%*H. Stat_Check;
-
-		%if %sysmacexist(stat_check) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\Stat_Check.sas";;
-
-	%*I. Stat_Default_Window;
-
-		%if %sysmacexist(stat_default_window) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\Stat_Default_Window.sas";;
-
-	%*J. State_Range_Window;
-
-		%if %sysmacexist(stat_range_window) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Control MACROS\Stat_Range_Window.sas";;
-
-	%*K. N_E_W;
-	
-		%if %sysmacexist(N_E_W) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\N_E_W.sas";;
-
-	%*L. Repeat;
-	
-		%if %sysmacexist(Repeat) = 0
-		%then
-			%include "T:\MKG\MACROS\GENERAL\Repeat.sas";;
+	%if &autocall ne TRUE 
+	%then
+		%macro_check(zero_check terminate invalid_char_loop invalid_char_window null null_window data_error stat_check stat_default_window stat_range_window N_E_W repeat);
 
 %****************************
 *III. SET DEFAULT VALUES	*
