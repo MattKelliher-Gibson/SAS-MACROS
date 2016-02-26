@@ -60,7 +60,7 @@
 
 	%*D. Alpha;
 
-		%let alpha = %str(ABCDEFGHIJKLMNOPQRSTUVWXYZ %'');
+		%let alpha = %str(ABCDEFGHIJKLMNOPQRSTUVWXYZ %'); %*';
 
 	%*E. Last Name Prefix 1;
 
