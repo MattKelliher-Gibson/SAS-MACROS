@@ -24,6 +24,7 @@
 ** 0.1.5 - 02/19/2016 - Corrected autocall logic                    **
 ** 0.1.6 - 02/19/2016 - Revert Back to Original autocall logic      **
 ** 0.1.7 - 02/25/2016 - Minor autocall fix and formatting           **
+** 0.1.8 - 05/17/2016 - Revert autocall fix                         **
 **********************************************************************
 **********************************************************************;
 
@@ -43,7 +44,7 @@
 
 	%*B. MACROS;
 	
-		%if %upcase(&_autocall) ne TRUE and %upcase(&_autocall) ne T
+		%if %upcase(&autocall) ne TRUE and %upcase(&autocall) ne T
 		%then 
 			%Macro_check(repeat);
 	
