@@ -22,4 +22,6 @@
 						Program Terminated, type=E);
 				%abort;
 			%end;	
+		%else
+			%return;
 	%mend data_error;
