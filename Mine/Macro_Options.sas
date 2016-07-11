@@ -26,8 +26,8 @@
 		%do;
 			option 
 				%if %upcase(&mprint) = TRUE %then %do; mprint %end;
-				%if %upcase (&mlogic) = TRUE %then %do mlogic %end;
-				%if %upcase (&symbolgen) = TRUE %then %do symbolgen %end;
+				%if %upcase (&mlogic) = TRUE %then %do; mlogic %end;
+				%if %upcase (&symbolgen) = TRUE %then %do; symbolgen %end;
 			;
 			%return;
 		%end;
@@ -37,8 +37,8 @@
 		%do;
 			option 
 				%if %upcase(&mprint) = TRUE %then %do; nomprint %end;
-				%if %upcase (&mlogic) = TRUE %then %do nomlogic %end;
-				%if %upcase (&symbolgen) = TRUE %then %do nosymbolgen %end;
+				%if %upcase (&mlogic) = TRUE %then %do; nomlogic %end;
+				%if %upcase (&symbolgen) = TRUE %then %do; nosymbolgen %end;
 			;
 			%return;
 		%end;
